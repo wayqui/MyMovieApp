@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">MyMovieApp</string>
+    <string name="menu_item_sort_popular">Sort by popularity</string>
+    <string name="menu_item_sort_top_rated">Sort by top rated</string>
+
+    <string name="url_prefijo">http</string>
+    <string name="url_imdb">api.themoviedb.org</string>
+    <string name="url_imdb_v3">3</string>
+    <string name="url_imdb_pelicula">movie</string>
+    <string name="url_imdb_api">api_key</string>
+
+    <string name="formato_fecha">yyyy-MM-dd</string>
+    <string name="cadena_fecha_estreno">Fecha de estreno: %1s</string>
+    <string name="cadena_puntuacion">Puntuación: %1$.2f/10</string>
+</resources>

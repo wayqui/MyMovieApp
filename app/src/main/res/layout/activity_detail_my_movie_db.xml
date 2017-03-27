@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_detail_my_movie_db"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.bustamante.jose.mymovieapp.DetailActivityMyMovieDB">
+
+        <ImageView
+            android:id="@+id/iv_movie_screen_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true" />
+
+        <TextView
+            android:id="@+id/tv_titulo_pelicula"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:layout_below="@id/iv_movie_screen_detail"
+            android:textSize="40sp"/>
+
+        <ImageView
+            android:id="@+id/iv_movie_poster_detail"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_titulo_pelicula"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/ll_datos_pelicula"
+            />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/ll_datos_pelicula"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_below="@id/tv_titulo_pelicula"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_fecha_estreno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                 />
+
+            <TextView
+                android:id="@+id/tv_promedio_votos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_sinopsis_pelicula"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:layout_below="@id/iv_movie_poster_detail"
+            android:textSize="15sp"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+</ScrollView>
