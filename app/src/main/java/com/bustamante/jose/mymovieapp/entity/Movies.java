@@ -78,4 +78,11 @@ public class Movies {
         this.totalPages = totalPages;
     }
 
+    public Movie obtenerPelicula(int position) {
+        if (this.getResults() != null && this.getResults().size() != 0)  {
+            return this.getResults().get(position);
+        }
+        return null;
+    }
+
 }

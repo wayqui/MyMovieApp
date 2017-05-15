@@ -18,6 +18,7 @@ public class Movie implements Serializable {
     public static final String ACCION_SERIALIZAR_MOVIE = "action_serializar_movie";
     public static final int TIPO_IMAGEN_POSTER = 1;
     public static final int TIPO_IMAGEN_FONDO = 2;
+
     public static final int TAMANO_IMAGEN_PEQUENO = 1;
     public static final int TAMANO_IMAGEN_GRANDE = 2;
 
@@ -77,7 +78,18 @@ public class Movie implements Serializable {
     @Expose
     private List<Integer> genreIds = null;
 
-    public Movie(int id, String originalTitle, String originalLanguage, String title, String backdropPath, float popularity, int voteCount, boolean video, float voteAverage, String posterPath, boolean adult, String overview, Date releaseDate, List<Integer> genreIds) {
+    @SerializedName("results")
+    @Expose
+    private List<String> reviews = null;
+
+    @SerializedName("youtube")
+    @Expose
+    private List<String> trailers = null;
+
+    public Movie(int id, String originalTitle, String originalLanguage, String title, String backdropPath,
+                 float popularity, int voteCount, boolean video, float voteAverage, String posterPath,
+                 boolean adult, String overview, Date releaseDate, List<Integer> genreIds,
+                 List<String> reviews, List<String> trailers) {
         super();
         this.id = id;
         this.originalTitle = originalTitle;
@@ -93,6 +105,8 @@ public class Movie implements Serializable {
         this.overview = overview;
         this.releaseDate = releaseDate;
         this.genreIds = genreIds;
+        this.reviews = reviews;
+        this.trailers = trailers;
     }
 
     public Movie() {
@@ -111,6 +125,8 @@ public class Movie implements Serializable {
         this.overview = null;
         this.releaseDate = null;
         this.genreIds = null;
+        this.reviews = null;
+        this.trailers = null;
     }
 
     public int getId() {
@@ -224,6 +240,14 @@ public class Movie implements Serializable {
     public void setGenreIds(List<Integer> genreIds) {
         this.genreIds = genreIds;
     }
+
+    public List<String> getReviews() {return reviews;}
+
+    public List<String> getTrailers() {return trailers;}
+
+    public void setReviews(List<String> reviews) {this.reviews = reviews;}
+
+    public void setTrailers(List<String> trailers) {this.trailers = trailers;}
 
     public String getImageUrl(int tipoImagen, int tamanoImagen) {
         String imagenSeleccionada = (tipoImagen == Movie.TIPO_IMAGEN_POSTER ? this.getPosterPath():this.getBackdropPath());

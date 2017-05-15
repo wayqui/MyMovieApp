@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bustamante.jose.mymovieapp.adapter.MyMovieDBListAdapter;
+import com.bustamante.jose.mymovieapp.async.MyMovieDBListAsync;
 import com.bustamante.jose.mymovieapp.entity.Movies;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -57,91 +58,34 @@ public class MainActivityMyMovieDB extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        MyMovieDBListAsync task;
         switch (item.getItemId()) {
             case R.id.menu_sort_popular:
                 movieAdapter.actualizarPeliculas(new Movies());
-                MyMovieDBListAsync task = new MyMovieDBListAsync(this);
+                task = new MyMovieDBListAsync(this);
                 task.execute(MyMovieDBListAsync.SORT_ORDER_POPULAR);
                 return true;
             case R.id.menu_sort_top_rated:
                 movieAdapter.actualizarPeliculas(new Movies());
-                MyMovieDBListAsync task2 = new MyMovieDBListAsync(this);
-                task2.execute(MyMovieDBListAsync.SORT_ORDER_TOP_RATED);
+                task = new MyMovieDBListAsync(this);
+                task.execute(MyMovieDBListAsync.SORT_ORDER_TOP_RATED);
                 return true;
+            case R.id.menu_show_favorites:
+                movieAdapter.actualizarPeliculas(new Movies());
+                task = new MyMovieDBListAsync(this);
+                task.execute(MyMovieDBListAsync.SHOW_FAVORITES);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public class MyMovieDBListAsync extends AsyncTask<String, Void, Movies> {
+    public MyMovieDBListAdapter getMovieAdapter() {
+        return movieAdapter;
+    }
 
-        public static final String SORT_ORDER_POPULAR = "POPULAR";
-        public static final String SORT_ORDER_TOP_RATED = "TOP_RATED";
-
-        private final Context contextoMyMovieDBList;
-
-        public MyMovieDBListAsync(Context context) {
-            contextoMyMovieDBList = context;
-        }
-
-        @Override
-        protected Movies doInBackground(String... params) {
-            Uri uri = construirUri(params);
-            StringBuilder movies = obtenerPeliculasDeIMDB(uri);
-            if (null != movies)
-                return obtenerListaObjetosMovie(movies);
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Movies s) {
-            movieAdapter.actualizarPeliculas(s);
-            movieAdapter.notifyDataSetChanged();
-        }
-
-        private StringBuilder obtenerPeliculasDeIMDB(Uri uri) {
-            URL url = null;
-            StringBuilder stringBuilder = null;
-            try {
-                url = new URL(uri.toString());
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(connection.getInputStream()));
-                stringBuilder = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line).append("\n");
-                }
-                reader.close();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return stringBuilder;
-        }
-
-        private Movies obtenerListaObjetosMovie(StringBuilder jsonPelis) {
-            Gson gSon=  new GsonBuilder().setDateFormat(contextoMyMovieDBList.getString(R.string.formato_fecha)).create();
-            return gSon.fromJson(jsonPelis.toString(), Movies.class);
-        }
-
-        private Uri construirUri(String[] params) {
-            Uri uri = new Uri.Builder()
-                    .scheme(contextoMyMovieDBList.getString(R.string.url_prefijo))
-                    .authority(contextoMyMovieDBList.getString(R.string.url_imdb))
-                    .appendPath(contextoMyMovieDBList.getString(R.string.url_imdb_v3))
-                    .appendPath(contextoMyMovieDBList.getString(R.string.url_imdb_pelicula))
-                    .appendPath(params[0].toLowerCase())
-                    .appendQueryParameter(contextoMyMovieDBList.getString(R.string.url_imdb_api), BuildConfig.MOVIEDB_API_KEY)
-                    .build();
-            Log.i(LOG, uri.toString());
-            return uri;
-        }
+    public void setMovieAdapter(MyMovieDBListAdapter movieAdapter) {
+        this.movieAdapter = movieAdapter;
     }
 }

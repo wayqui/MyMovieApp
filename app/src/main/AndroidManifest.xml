@@ -18,6 +18,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetailActivityMyMovieDB"></activity>
+
+        <provider
+            android:authorities="com.bustamante.jose.mymovieapp"
+            android:name="com.bustamante.jose.mymovieapp.provider.MovieDBContentProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -37,6 +37,11 @@ public class MyMovieDBListAdapter extends RecyclerView.Adapter<MyMovieDBListAdap
         return this.numeroPeliculas;
     }
 
+    public void actualizarPeliculas(Movies pelis) {
+        this.peliculas = pelis;
+        this.numeroPeliculas = pelis.getResults().size();
+    }
+
     @Override
     public MyMovieDBListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).
@@ -47,12 +52,11 @@ public class MyMovieDBListAdapter extends RecyclerView.Adapter<MyMovieDBListAdap
 
     @Override
     public void onBindViewHolder(MyMovieDBListViewHolder holder, int position) {
-        final Movie pelicula = obtenerPelicula(position);
+        final Movie pelicula = peliculas.obtenerPelicula(position);
 
         if (pelicula == null) return;
 
         Picasso.with(contexto).load(pelicula.getImageUrl(Movie.TIPO_IMAGEN_POSTER, Movie.TAMANO_IMAGEN_PEQUENO)).into(holder.mImageView);
-
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,17 +66,6 @@ public class MyMovieDBListAdapter extends RecyclerView.Adapter<MyMovieDBListAdap
 
             }
         });
-    }
-
-    private Movie obtenerPelicula(int position) {
-        if (this.peliculas != null && this.peliculas.getResults() != null && this.peliculas.getResults().size() != 0)  {
-            return this.peliculas.getResults().get(position);
-        }
-        return null;
-    }
-
-    public void actualizarPeliculas(Movies pelis) {
-        this.peliculas = pelis;
     }
 
     /**
