@@ -39,7 +39,8 @@ public class MyMovieDBListAdapter extends RecyclerView.Adapter<MyMovieDBListAdap
 
     public void actualizarPeliculas(Movies pelis) {
         this.peliculas = pelis;
-        this.numeroPeliculas = pelis.getResults().size();
+        if (pelis != null && pelis.getResults() != null)
+            this.numeroPeliculas = pelis.getResults().size();
     }
 
     @Override
@@ -52,6 +53,8 @@ public class MyMovieDBListAdapter extends RecyclerView.Adapter<MyMovieDBListAdap
 
     @Override
     public void onBindViewHolder(MyMovieDBListViewHolder holder, int position) {
+        if (peliculas == null) return;
+
         final Movie pelicula = peliculas.obtenerPelicula(position);
 
         if (pelicula == null) return;

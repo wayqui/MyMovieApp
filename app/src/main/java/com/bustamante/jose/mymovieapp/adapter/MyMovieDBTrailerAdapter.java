@@ -43,7 +43,9 @@ public class MyMovieDBTrailerAdapter extends RecyclerView.Adapter<MyMovieDBTrail
 
     @Override
     public int getItemCount() {
-        return this.trailers.getResults().size();
+        if (this.trailers != null && this.trailers.getResults() != null)
+            return this.trailers.getResults().size();
+        return 0;
     }
 
     public void setTrailers(Trailers trailers) {

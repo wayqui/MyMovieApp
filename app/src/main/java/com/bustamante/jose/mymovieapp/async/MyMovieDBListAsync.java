@@ -77,7 +77,8 @@ public class MyMovieDBListAsync extends AsyncTask<String, Void, Movies> {
                     parametros[0] = idq.toString();
                     Uri uri = construirUri(parametros);
                     StringBuilder strBuildMovies = obtenerPeliculasDeIMDB(uri);
-                    listaPelis.add(obtenerListaObjetosMovie(strBuildMovies));
+                    if (strBuildMovies != null)
+                        listaPelis.add(obtenerListaObjetosMovie(strBuildMovies));
                 } while (cursorFavoritos.moveToNext());
             }
 

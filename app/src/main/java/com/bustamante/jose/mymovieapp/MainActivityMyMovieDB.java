@@ -31,8 +31,15 @@ public class MainActivityMyMovieDB extends AppCompatActivity {
 
     private RecyclerView rvMyMovieDB;
     private MyMovieDBListAdapter movieAdapter;
+    private GridLayoutManager glmMovieManager;
     private final int NUMERO_PELICULAS = 20;
-    private final int NUMERO_COLUMNAS = 3;
+
+    private final String POSICION_GRID = "posicionListado";
+    private final String TIPO_GRID = "tipoListado";
+
+
+    private String tipoListado;
+    private Integer posicionListado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +47,32 @@ public class MainActivityMyMovieDB extends AppCompatActivity {
         setContentView(R.layout.activity_main_my_movie_db);
 
         MyMovieDBListAsync task = new MyMovieDBListAsync(this);
-        task.execute(MyMovieDBListAsync.SORT_ORDER_POPULAR);
+
+        tipoListado = MyMovieDBListAsync.SORT_ORDER_POPULAR;
+        posicionListado = 0;
+
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getSerializable(TIPO_GRID) != null) {
+                tipoListado = (String) savedInstanceState.getSerializable(TIPO_GRID);
+            }
+            if (savedInstanceState.getInt(POSICION_GRID) > 0) {
+                posicionListado = savedInstanceState.getInt(POSICION_GRID);
+            }
+        }
+
+        task.execute(tipoListado);
 
         movieAdapter = new MyMovieDBListAdapter(this, NUMERO_PELICULAS, new Movies());
-
         rvMyMovieDB = (RecyclerView) findViewById(R.id.rv_my_movie_db_list);
-        rvMyMovieDB.setLayoutManager(new GridLayoutManager(this, NUMERO_COLUMNAS));
+
+        final int columns = getResources().getInteger(R.integer.gallery_columns);
+        rvMyMovieDB.setLayoutManager(new GridLayoutManager(this, columns));
+
         rvMyMovieDB.setAdapter(movieAdapter);
         rvMyMovieDB.setHasFixedSize(true);
+        if (posicionListado > 0 )
+            rvMyMovieDB.setScrollY(posicionListado);
     }
 
     @Override
@@ -63,17 +88,20 @@ public class MainActivityMyMovieDB extends AppCompatActivity {
             case R.id.menu_sort_popular:
                 movieAdapter.actualizarPeliculas(new Movies());
                 task = new MyMovieDBListAsync(this);
-                task.execute(MyMovieDBListAsync.SORT_ORDER_POPULAR);
+                tipoListado = MyMovieDBListAsync.SORT_ORDER_POPULAR;
+                task.execute(tipoListado);
                 return true;
             case R.id.menu_sort_top_rated:
                 movieAdapter.actualizarPeliculas(new Movies());
                 task = new MyMovieDBListAsync(this);
-                task.execute(MyMovieDBListAsync.SORT_ORDER_TOP_RATED);
+                tipoListado = MyMovieDBListAsync.SORT_ORDER_TOP_RATED;
+                task.execute(tipoListado);
                 return true;
             case R.id.menu_show_favorites:
                 movieAdapter.actualizarPeliculas(new Movies());
                 task = new MyMovieDBListAsync(this);
-                task.execute(MyMovieDBListAsync.SHOW_FAVORITES);
+                tipoListado = MyMovieDBListAsync.SHOW_FAVORITES;
+                task.execute(tipoListado);
                 return true;
 
             default:
@@ -87,5 +115,22 @@ public class MainActivityMyMovieDB extends AppCompatActivity {
 
     public void setMovieAdapter(MyMovieDBListAdapter movieAdapter) {
         this.movieAdapter = movieAdapter;
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(TIPO_GRID, tipoListado);
+        if (rvMyMovieDB != null)
+            outState.putInt(POSICION_GRID, rvMyMovieDB.getScrollY());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        tipoListado = (String) savedInstanceState.getSerializable(TIPO_GRID);
+        posicionListado = savedInstanceState.getInt(POSICION_GRID);
+
     }
 }

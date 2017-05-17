@@ -2,7 +2,10 @@ package com.bustamante.jose.mymovieapp;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,43 +35,38 @@ public class DetailActivityMyMovieDB extends AppCompatActivity {
 
     private static final String LOG = com.bustamante.jose.mymovieapp.DetailActivityMyMovieDB.class.getName();
 
+    private final int NUMERO_MAX_REVIEWS = 20;
+
     private TextView tvTituloPelicula;
     private TextView tvSinopsisPelicula;
     private ImageView ivFondoPelicula;
     private ImageView ivPosterPelicula;
     private TextView tvFechaEstreno;
     private TextView tvPromedioVotos;
+    private MyMovieDBReviewAdapter reviewAdapter;
+    private RecyclerView rvReviews;
+    private MyMovieDBTrailerAdapter trailerAdapter;
+    private RecyclerView rvTrailers;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
 
     private Movie datosPeliSeleccionada;
 
-    private MyMovieDBReviewAdapter reviewAdapter;
-    private RecyclerView rvReviews;
+    private Boolean boolAddToFavorites;
 
-    private MyMovieDBTrailerAdapter trailerAdapter;
-    private RecyclerView rvTrailers;
-
-    public MyMovieDBReviewAdapter getReviewAdapter() {
-        return reviewAdapter;
-    }
-
-    public void setReviewAdapter(MyMovieDBReviewAdapter reviewAdapter) {
-        this.reviewAdapter = reviewAdapter;
-    }
-
-    public MyMovieDBTrailerAdapter getTrailerAdapter() {
-        return trailerAdapter;
-    }
-
-    public void setTrailerAdapter(MyMovieDBTrailerAdapter trailerAdapter) {
-        this.trailerAdapter = trailerAdapter;
-    }
-
-    private final int NUMERO_MAX_REVIEWS = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_my_movie_db);
+
+        ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout), "NOMBRE_TRANS");
+
+
+        String itemTitle = "TITULO";
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(itemTitle);
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+
 
         tvTituloPelicula = (TextView) findViewById(R.id.tv_titulo_pelicula);
         tvSinopsisPelicula = (TextView) findViewById(R.id.tv_sinopsis_pelicula);
@@ -126,7 +124,47 @@ public class DetailActivityMyMovieDB extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.my_movie_db_detail_menu, menu);
+        boolAddToFavorites = true;
+        if (buscarPeliculaFavoritaXID(Integer.toString(datosPeliSeleccionada.getId()))) {
+            MenuItem opcionFavoritos = menu.findItem(R.id.menu_add_favorites);
+            opcionFavoritos.setTitle(R.string.menu_item_remove_favorites);
+            boolAddToFavorites = false;
+        }
+
         return true;
+    }
+
+    private Boolean buscarPeliculaFavoritaXID(String idPelicula) {
+        String[] projection = new String[] {MovieDBContract.MovieDBEntry.COLUMN_MOVIE_ID};
+        String selection = MovieDBContract.MovieDBEntry.COLUMN_MOVIE_ID + "=?";
+        String[] selectionArgs = new String[] {idPelicula};
+
+        Cursor resultado = getContentResolver().query(MovieDBContract.MovieDBEntry.CONTENT_URI, projection, selection, selectionArgs, null);
+
+        return (resultado.getCount() > 0);
+    }
+
+    private int eliminarPeliculaDeFavoritos(String idPelicula) {
+        String selection = MovieDBContract.MovieDBEntry.COLUMN_MOVIE_ID + "=?";
+        String[] selectionArgs = new String[] {idPelicula};
+        return getContentResolver().delete(MovieDBContract.MovieDBEntry.CONTENT_URI, selection, selectionArgs);
+    }
+
+    private Uri aniadirPeliculaAFavoritos() {
+        ContentValues valores = new ContentValues();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+        String fechaRelease = formatter.format(datosPeliSeleccionada.getReleaseDate());
+
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_MOVIE_ID, datosPeliSeleccionada.getId());
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_TITLE, datosPeliSeleccionada.getTitle());
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_RELEASE, fechaRelease);
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_SCORE, datosPeliSeleccionada.getPopularity());
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_SYNOPSIS, datosPeliSeleccionada.getOverview());
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_POSTER_BIG, datosPeliSeleccionada.getBackdropPath());
+        valores.put(MovieDBContract.MovieDBEntry.COLUMN_POSTER_SMALL, datosPeliSeleccionada.getPosterPath());
+
+        return getContentResolver().insert(MovieDBContract.MovieDBEntry.CONTENT_URI, valores);
     }
 
     @Override
@@ -134,28 +172,50 @@ public class DetailActivityMyMovieDB extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_add_favorites:
 
-                ContentValues valores = new ContentValues();
-
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-                String fechaRelease = formatter.format(datosPeliSeleccionada.getReleaseDate());
-
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_MOVIE_ID, datosPeliSeleccionada.getId());
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_TITLE, datosPeliSeleccionada.getTitle());
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_RELEASE, fechaRelease);
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_SCORE, datosPeliSeleccionada.getPopularity());
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_SYNOPSIS, datosPeliSeleccionada.getOverview());
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_POSTER_BIG, datosPeliSeleccionada.getBackdropPath());
-                valores.put(MovieDBContract.MovieDBEntry.COLUMN_POSTER_SMALL, datosPeliSeleccionada.getPosterPath());
-
-                Uri uriAddTask = getContentResolver().insert(MovieDBContract.MovieDBEntry.CONTENT_URI, valores);
-
-                if (uriAddTask != null) {
-                    Toast.makeText(getBaseContext(), uriAddTask.toString(), Toast.LENGTH_LONG).show();
+                if (boolAddToFavorites) {
+                    Uri resultado = this.aniadirPeliculaAFavoritos();
+                    if (resultado != null) {
+                        Toast.makeText(getBaseContext(), resultado.toString(), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    int numeroBorrados = this.eliminarPeliculaDeFavoritos(Integer.toString(datosPeliSeleccionada.getId()));
+                    if (numeroBorrados > 0) {
+                        Toast.makeText(getBaseContext(), "Se han borrado "+numeroBorrados+" elementos", Toast.LENGTH_LONG).show();
+                    }
                 }
-
+                boolAddToFavorites = !(boolAddToFavorites);
                 finish();
+                updateMenuTitles(item);
+
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
-        }    }
+        }
+    }
+
+
+    public MyMovieDBReviewAdapter getReviewAdapter() {
+        return reviewAdapter;
+    }
+
+    public void setReviewAdapter(MyMovieDBReviewAdapter reviewAdapter) {
+        this.reviewAdapter = reviewAdapter;
+    }
+
+    public MyMovieDBTrailerAdapter getTrailerAdapter() {
+        return trailerAdapter;
+    }
+
+    public void setTrailerAdapter(MyMovieDBTrailerAdapter trailerAdapter) {
+        this.trailerAdapter = trailerAdapter;
+    }
+
+    private void updateMenuTitles(MenuItem bedMenuItem) {
+        if (boolAddToFavorites) {
+            bedMenuItem.setTitle(R.string.menu_item_add_favorites);
+        } else {
+            bedMenuItem.setTitle(R.string.menu_item_remove_favorites);
+        }
+    }
 }

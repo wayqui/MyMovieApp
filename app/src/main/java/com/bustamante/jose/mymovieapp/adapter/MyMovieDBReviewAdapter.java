@@ -25,7 +25,10 @@ public class MyMovieDBReviewAdapter extends RecyclerView.Adapter<MyMovieDBReview
 
     @Override
     public int getItemCount() {
-        return this.reviews.getResults().size();
+
+        if (reviews != null && reviews.getResults() != null)
+            return this.reviews.getResults().size();
+        return 0;
     }
 
     public void setReviews(Reviews reviews) {

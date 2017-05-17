@@ -91,7 +91,23 @@ public class MovieDBContentProvider extends ContentProvider{
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+
+        final SQLiteDatabase baseDatosSQLite = myTaskDBHelper.getWritableDatabase();
+
+        int retrieveValue;
+        switch (sUriMatcher.match(uri)) {
+            case MOVIES: {
+                retrieveValue = baseDatosSQLite.delete(MovieDBContract.MovieDBEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs);
+                break;
+            }
+            default: {
+                throw new UnsupportedOperationException("Unknown insert uri: " + uri);
+            }
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return retrieveValue;
     }
 
     @Override

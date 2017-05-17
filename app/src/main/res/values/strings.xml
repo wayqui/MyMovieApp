@@ -4,6 +4,8 @@
     <string name="menu_item_sort_top_rated">Sort by top rated</string>
     <string name="menu_item_show_favorites">Show favorites</string>
     <string name="menu_item_add_favorites">Add to favorites</string>
+    <string name="menu_item_remove_favorites">Remove from favorites</string>
+
 
     <string name="url_prefijo">http</string>
     <string name="url_imdb">api.themoviedb.org</string>
